@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "🛂 AWS Arrival Stamper",
+  "description": "AWS環境到着の記念に、ヘッダーを美しい色でスタンプします",
+  "version": "1.0.0",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://console.aws.amazon.com/*",
+    "https://*.console.aws.amazon.com/*",
+    "https://signin.aws.amazon.com/*",
+    "https://*.awsapps.com/start/*",
+    "https://*.awsapps.com/*/dashboard/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://console.aws.amazon.com/*",
+        "https://*.console.aws.amazon.com/*",
+        "https://signin.aws.amazon.com/*",
+        "https://*.awsapps.com/start/*",
+        "https://*.awsapps.com/*/dashboard/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "🛂 AWS Arrival Stamper Settings"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; frame-src 'none'; worker-src 'none'; base-uri 'self'; form-action 'none';"
+  }
+}

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🛂 AWS Arrival Stamper Settings</title>
+  <style>
+    body {
+      width: 320px;
+      min-height: 600px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .header p {
+      margin: 8px 0 0 0;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .section {
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .section h3 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .setting-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .setting-label {
+      font-size: 13px;
+      flex: 1;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle.active {
+      background: #22c55e;
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle.active::after {
+      transform: translateX(20px);
+    }
+
+    select {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      min-width: 120px;
+    }
+
+    .preview-area {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .preview-stamp {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: bold;
+      text-align: center;
+      color: #333;
+      transform: rotate(-5deg);
+    }
+
+    .preview-stamp.dev {
+      border-color: #22c55e;
+    }
+
+    .preview-stamp.staging {
+      border-color: #f59e0b;
+    }
+
+    .preview-stamp.prod {
+      border-color: #ef4444;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .status.active {
+      background: rgba(34, 197, 94, 0.2);
+    }
+
+    .status.inactive {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    .reset-btn {
+      background: rgba(239, 68, 68, 0.8);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .reset-btn:hover {
+      background: rgba(239, 68, 68, 1);
+    }
+
+    .reset-btn.success {
+      background: rgba(34, 197, 94, 0.8);
+    }
+
+    .aws-page-info {
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+    /* アカウント設定フォーム要素 */
+    .account-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      width: 140px;
+    }
+
+    .account-input.name-input {
+      width: 120px;
+    }
+
+    .account-select {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      min-width: 100px;
+    }
+
+    .account-color {
+      width: 40px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .save-btn {
+      background: rgba(34, 197, 94, 0.8);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .save-btn:hover {
+      background: rgba(34, 197, 94, 1);
+    }
+
+    .save-btn.success {
+      background: rgba(34, 197, 94, 1);
+    }
+
+    .delete-btn {
+      background: rgba(239, 68, 68, 0.8);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .delete-btn:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 1);
+    }
+
+    .delete-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .account-list {
+      margin-top: 12px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .account-list-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .account-list-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .account-info {
+      flex: 1;
+    }
+
+    .account-id {
+      font-weight: bold;
+    }
+
+    .account-name {
+      opacity: 0.8;
+    }
+
+    .account-env {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .account-color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .empty-message {
+      font-size: 11px;
+      opacity: 0.7;
+      text-align: center;
+      margin: 8px 0;
+    }
+
+    .description-text {
+      font-size: 12px;
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    .error-message {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      z-index: 10000;
+      max-width: 280px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>🛂 AWS Arrival Stamper</h1>
+    <p>AWS環境到着記念スタンプサービス</p>
+  </div>
+
+  <div class="section">
+    <h3>⚙️ 基本設定</h3>
+
+    <div class="setting-item">
+      <span class="setting-label">スタンプ機能を有効にする</span>
+      <div class="toggle active" id="enableToggle"></div>
+    </div>
+
+    <div class="setting-item">
+      <span class="setting-label">リージョン別カラーを有効にする</span>
+      <div class="toggle active" id="regionColorsToggle"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🎨 スタンプスタイル</h3>
+
+    <div class="setting-item">
+      <span class="setting-label">スタイル</span>
+      <select id="stampStyle">
+        <option value="classic">Classic (シンプル)</option>
+        <option value="vintage">Vintage (ヴィンテージ)</option>
+        <option value="modern">Modern (モダン)</option>
+        <option value="cute">Cute (可愛い)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🏢 アカウント設定</h3>
+    <p class="description-text">アカウントIDごとに環境とカラーを指定できます</p>
+    
+    <div class="setting-item">
+      <span class="setting-label">アカウントID</span>
+      <input type="text" id="accountId" placeholder="123456789012" maxlength="12" class="account-input">
+    </div>
+    
+    <div class="setting-item">
+      <span class="setting-label">環境名</span>
+      <select id="accountEnvironment" class="account-select">
+        <option value="">自動判定</option>
+        <option value="dev">Development</option>
+        <option value="staging">Staging</option>
+        <option value="prod">Production</option>
+        <option value="test">Test</option>
+        <option value="sandbox">Sandbox</option>
+      </select>
+    </div>
+    
+    <div class="setting-item">
+      <span class="setting-label">カラー</span>
+      <input type="color" id="accountColor" value="#3b82f6" class="account-color">
+    </div>
+    
+    <div class="setting-item">
+      <span class="setting-label">表示名</span>
+      <input type="text" id="accountName" placeholder="本番環境" class="account-input name-input">
+    </div>
+    
+    <div class="button-group">
+      <button id="saveAccountBtn" class="save-btn">保存</button>
+      <button id="deleteAccountBtn" class="delete-btn" disabled>削除</button>
+    </div>
+    
+    <div id="accountList" class="account-list"></div>
+  </div>
+
+  <div class="section">
+    <h3>👀 プレビュー</h3>
+    <p class="description-text">スタンプの表示例：</p>
+
+    <div class="preview-area">
+      <div class="preview-stamp dev">
+        🛂<br>
+        🇺🇸 Virginia DEV<br>
+        <small>12:34:56</small>
+      </div>
+      <div class="preview-stamp staging">
+        🛂<br>
+        🇯🇵 Tokyo STAGING<br>
+        <small>12:34:56</small>
+      </div>
+      <div class="preview-stamp prod">
+        🛂<br>
+        🇪🇺 Ireland PROD<br>
+        <small>12:34:56</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="status active" id="status">
+    ✅ スタンプサービス有効
+  </div>
+
+  <div class="section">
+    <h3>🔧 その他</h3>
+    <button class="reset-btn" id="resetBtn">設定をリセット</button>
+  </div>
+
+  <div class="footer">
+    <p>version 1.0.0 | AWS環境を彩る旅のお供</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

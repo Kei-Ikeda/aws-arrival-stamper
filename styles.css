@@ -1,0 +1,267 @@
+/* 🛂 AWS Arrival Stamper Styles */
+
+/* スタンプアニメーション */
+@keyframes arrivalStamp {
+  0% { 
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  30% { 
+    transform: scale(1.3) rotate(-10deg);
+    opacity: 0.8;
+  }
+  70% { 
+    transform: scale(0.9) rotate(5deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1) rotate(-8deg);
+    opacity: 0.95;
+  }
+}
+
+@keyframes fadeInGreeting {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* メインスタンプ要素 */
+.aws-arrival-stamp {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  padding: 12px 16px;
+  
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-align: center;
+  
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    
+  transform: rotate(-8deg);
+  
+  pointer-events: none;
+  user-select: none;
+}
+
+/* スタンプスタイル - Classic */
+.aws-arrival-stamp.classic {
+  border-style: solid;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* スタンプスタイル - Vintage */
+.aws-arrival-stamp.vintage {
+  border-style: dashed;
+  background: rgba(250, 240, 220, 0.95);
+  filter: sepia(0.3);
+}
+
+/* スタンプスタイル - Modern */
+.aws-arrival-stamp.modern {
+  border-radius: 20px;
+  border: 2px solid;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+}
+
+/* スタンプスタイル - Cute */
+.aws-arrival-stamp.cute {
+  border-radius: 50px;
+  border: 4px dotted;
+  background: rgba(255, 250, 250, 0.95);
+  animation: arrivalStamp 2s ease-out, shimmer 3s ease-in-out infinite;
+}
+
+/* スタンプアイコン */
+.stamp-icon {
+  font-size: 24px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+/* スタンプテキスト */
+.stamp-text {
+  margin: 4px 0;
+}
+
+.stamp-main {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.stamp-time {
+  font-size: 10px;
+  opacity: 0.7;
+  line-height: 1;
+}
+
+/* 挨拶メッセージ */
+.stamp-greeting {
+  font-size: 11px;
+  margin-top: 6px;
+  opacity: 0.8;
+  font-style: italic;
+  animation: fadeInGreeting 1s ease-out 1s both;
+}
+
+/* 環境別スタンプ色 */
+.aws-arrival-stamp[data-env="dev"] {
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.aws-arrival-stamp[data-env="staging"] {
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.aws-arrival-stamp[data-env="prod"] {
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.aws-arrival-stamp[data-env="sso"] {
+  border-color: #8b5cf6;
+  color: #5b21b6;
+}
+
+.aws-arrival-stamp[data-env="console"] {
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+/* ヘッダー改良 - セキュリティ強化 */
+.aws-arrival-header {
+  position: relative;
+  overflow: hidden;
+  /* CSS変数を使用してセキュアなスタイル適用 */
+  background: linear-gradient(135deg, 
+    var(--aws-stamp-base-color, #3b82f6), 
+    var(--aws-stamp-accent-color, #3b82f6)) !important;
+  transition: var(--aws-stamp-transition, 1s ease-in-out);
+  
+  /* セキュリティ: clickjacking対策 */
+  pointer-events: auto !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+.aws-arrival-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* 環境別ヘッダースタイル */
+.aws-arrival-header.env-dev {
+  border-bottom: 3px solid #22c55e;
+}
+
+.aws-arrival-header.env-staging {
+  border-bottom: 3px solid #f59e0b;
+}
+
+.aws-arrival-header.env-prod {
+  border-bottom: 3px solid #ef4444;
+  position: relative;
+}
+
+.aws-arrival-header.env-prod::after {
+  content: '⚠️ PRODUCTION ENVIRONMENT ⚠️';
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ef4444;
+  color: white;
+  padding: 2px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 10px;
+  animation: fadeInGreeting 1s ease-out 2s both;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .aws-arrival-stamp {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .stamp-icon {
+    font-size: 20px;
+  }
+  
+  .stamp-main {
+    font-size: 12px;
+  }
+  
+  .stamp-time {
+    font-size: 9px;
+  }
+  
+  .stamp-greeting {
+    font-size: 10px;
+  }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .aws-arrival-stamp {
+    background: rgba(31, 41, 55, 0.95);
+    color: #f9fafb;
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .aws-arrival-stamp.vintage {
+    background: rgba(55, 48, 42, 0.95);
+  }
+  
+  .aws-arrival-stamp.cute {
+    background: rgba(45, 45, 55, 0.95);
+  }
+}
+
+/* ホバー効果（デバッグ用） */
+.aws-arrival-stamp:hover {
+  pointer-events: auto;
+  transform: rotate(-8deg) scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* 印刷時は非表示 */
+@media print {
+  .aws-arrival-stamp {
+    display: none !important;
+  }
+}
