@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles for Chrome Extension */
+* {
+  box-sizing: border-box;
+}
+
+/* Content Script専用のスタイル（Preflight無効化） */
+.aws-stamp-container {
+  all: initial;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.aws-stamp-container * {
+  all: unset;
+  display: revert;
+  box-sizing: border-box;
+}
