@@ -53,7 +53,7 @@ class AWSArrivalStamper {
       this.regionColors = settings.regionColors !== false;
       this.stampStyle = settings.stampStyle || 'classic';
       this.accountColors = settings.accountColors || {};
-    } catch (error) {
+    } catch (_error) {
       console.warn('Settings load failed, using defaults');
     }
   }
@@ -182,9 +182,6 @@ class AWSArrivalStamper {
 
     // Create and insert stamp
     this.insertStamp(stampData);
-
-    // Record usage
-    this.recordStampUsage(environment, region);
 
     // this.currentStamp = stampData;
     console.log(`🛂 Stamped: ${region} ${environment}`);
@@ -356,21 +353,6 @@ class AWSArrivalStamper {
         });
       }
     });
-  }
-
-  private async recordStampUsage(environment: EnvironmentType, region: RegionCode): Promise<void> {
-    try {
-      await chrome.runtime.sendMessage({
-        type: 'STAMP_APPLIED',
-        data: {
-          environment,
-          region,
-          timestamp: Date.now(),
-        },
-      });
-    } catch (error) {
-      // Background script communication failure is acceptable
-    }
   }
 }
 

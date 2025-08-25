@@ -1,6 +1,11 @@
 import type { AccountConfig, AccountFormData, EnvironmentType } from '@shared/types';
-import { isValidAccountId, sanitizeAccountId, sanitizeColor, sanitizeName } from '@shared/utils';
-import { cn } from '@shared/utils';
+import {
+  cn,
+  isValidAccountId,
+  sanitizeAccountId,
+  sanitizeColor,
+  sanitizeName,
+} from '@shared/utils';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -134,7 +139,12 @@ const AccountManager: React.FC<AccountManagerProps> = ({
         <select
           id="accountEnvironment"
           value={formData.environment}
-          onChange={(e) => setFormData((prev) => ({ ...prev, environment: e.target.value as EnvironmentType | '' }))}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              environment: e.target.value as EnvironmentType | '',
+            }))
+          }
           className="w-full bg-white/90 border-none rounded-md px-3 py-2 text-sm text-gray-800 focus:ring-2 focus:ring-blue-300"
         >
           <option value="">自動判定</option>

@@ -74,15 +74,6 @@ export interface BackgroundReadyMessage extends ChromeMessage {
   timestamp: number;
 }
 
-export interface StampAppliedMessage extends ChromeMessage {
-  type: 'STAMP_APPLIED';
-  data: {
-    environment: EnvironmentType;
-    region: RegionCode;
-    timestamp: number;
-  };
-}
-
 export interface GetSettingsMessage extends ChromeMessage {
   type: 'GET_SETTINGS';
 }
@@ -92,22 +83,10 @@ export interface UpdateSettingsMessage extends ChromeMessage {
   settings: Partial<ChromeStorageSettings>;
 }
 
-export interface GetStatsMessage extends ChromeMessage {
-  type: 'GET_STATS';
-}
-
 export interface MessageResponse {
   success: boolean;
   settings?: ChromeStorageSettings;
-  stats?: UsageStats;
   error?: string;
-}
-
-export interface UsageStats {
-  totalStamps: number;
-  environments: Record<EnvironmentType, number>;
-  regions: Record<RegionCode, number>;
-  lastUsed: string | null;
 }
 
 // React Component Props

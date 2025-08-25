@@ -1,12 +1,8 @@
 import { DEFAULT_SETTINGS, RATE_LIMITS } from '@shared/constants';
-import type {
-  AccountConfig,
-  ChromeStorageSettings,
-  StampStyle,
-} from '@shared/types';
+import type { AccountConfig, ChromeStorageSettings, StampStyle } from '@shared/types';
 import { createRateLimiter, isAWSPage } from '@shared/utils';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import AccountManager from './components/AccountManager';
 import PreviewStamp from './components/PreviewStamp';
@@ -22,12 +18,7 @@ const PopupApp: React.FC = () => {
 
   const saveRateLimiter = createRateLimiter(RATE_LIMITS.SAVE_SETTINGS);
 
-  useEffect(() => {
-    loadSettings();
-    getCurrentTab();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       const stored = await chrome.storage.sync.get([
         'isEnabled',
@@ -47,16 +38,21 @@ const PopupApp: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getCurrentTab = async () => {
+  const getCurrentTab = useCallback(async () => {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       setCurrentTab(tab);
     } catch (error) {
       console.warn('Failed to get current tab:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadSettings();
+    getCurrentTab();
+  }, [loadSettings, getCurrentTab]);
 
   const saveSettings = async (newSettings: Partial<ChromeStorageSettings>) => {
     if (!saveRateLimiter()) {
@@ -86,7 +82,7 @@ const PopupApp: React.FC = () => {
           type: 'SETTINGS_UPDATED',
           settings: newSettings,
         });
-      } catch (error) {
+      } catch (_error) {
         // Content script might not be ready
       }
     }
@@ -133,7 +129,7 @@ const PopupApp: React.FC = () => {
         await chrome.storage.sync.clear();
         setSettings(DEFAULT_SETTINGS);
         showSuccess('設定をリセットしました');
-      } catch (error) {
+      } catch (_error) {
         showError('設定のリセットに失敗しました');
       }
     }
