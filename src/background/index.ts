@@ -1,12 +1,5 @@
 import { AWS_URLS, DEFAULT_SETTINGS, RATE_LIMITS } from '@shared/constants';
-import type {
-  ChromeMessage,
-  ChromeStorageSettings,
-  EnvironmentType,
-  MessageResponse,
-  RegionCode,
-  UsageStats,
-} from '@shared/types';
+import type { ChromeMessage, ChromeStorageSettings, MessageResponse } from '@shared/types';
 import { isAWSPage } from '@shared/utils';
 
 class BackgroundService {
@@ -112,7 +105,7 @@ class BackgroundService {
 
   private handleTabUpdate(
     tabId: number,
-    changeInfo: chrome.tabs.TabChangeInfo,
+    changeInfo: chrome.tabs.OnUpdatedInfo,
     tab: chrome.tabs.Tab
   ): void {
     if (changeInfo.status === 'complete' && tab.url) {
@@ -163,7 +156,7 @@ class BackgroundService {
           type: 'BACKGROUND_READY',
           timestamp: Date.now(),
         });
-      } catch (error) {
+      } catch (_error) {
         // Content script might not be ready yet
       }
     }, 1000);
@@ -202,32 +195,15 @@ class BackgroundService {
         }
 
         case 'UPDATE_SETTINGS': {
-          const updateMessage = message as ChromeMessage & { settings: Partial<ChromeStorageSettings> };
+          const updateMessage = message as ChromeMessage & {
+            settings: Partial<ChromeStorageSettings>;
+          };
           if (!updateMessage.settings || typeof updateMessage.settings !== 'object') {
             sendResponse({ success: false, error: 'Invalid settings format' });
             break;
           }
           await chrome.storage.sync.set(updateMessage.settings);
           sendResponse({ success: true });
-          break;
-        }
-
-        case 'STAMP_APPLIED': {
-          const stampMessage = message as ChromeMessage & {
-            data: { environment: EnvironmentType; region: RegionCode; timestamp: number };
-          };
-          if (!stampMessage.data || typeof stampMessage.data !== 'object') {
-            sendResponse({ success: false, error: 'Invalid data format' });
-            break;
-          }
-          await this.recordStampUsage(stampMessage.data);
-          sendResponse({ success: true });
-          break;
-        }
-
-        case 'GET_STATS': {
-          const stats = await this.getUsageStats();
-          sendResponse({ success: true, stats: stats || undefined });
           break;
         }
 
@@ -297,50 +273,6 @@ class BackgroundService {
 
     this.rateLimiter.set(key, now);
     return true;
-  }
-
-  private async recordStampUsage(data: {
-    environment: EnvironmentType;
-    region: RegionCode;
-    timestamp: number;
-  }): Promise<void> {
-    try {
-      const result = await chrome.storage.local.get('usage_stats');
-      const currentStats: UsageStats = result.usage_stats || {
-        totalStamps: 0,
-        environments: {} as Record<EnvironmentType, number>,
-        regions: {} as Record<RegionCode, number>,
-        lastUsed: null,
-      };
-
-      // Update statistics
-      currentStats.totalStamps++;
-      currentStats.environments[data.environment] =
-        (currentStats.environments[data.environment] || 0) + 1;
-      currentStats.regions[data.region] = (currentStats.regions[data.region] || 0) + 1;
-      currentStats.lastUsed = new Date().toISOString();
-
-      await chrome.storage.local.set({ usage_stats: currentStats });
-    } catch (error) {
-      console.error('Failed to record usage stats:', error);
-    }
-  }
-
-  private async getUsageStats(): Promise<UsageStats | null> {
-    try {
-      const result = await chrome.storage.local.get('usage_stats');
-      return (
-        result.usage_stats || {
-          totalStamps: 0,
-          environments: {},
-          regions: {},
-          lastUsed: null,
-        }
-      );
-    } catch (error) {
-      console.error('Failed to get usage stats:', error);
-      return null;
-    }
   }
 }
 
